@@ -19,6 +19,19 @@
             padding: 20px;
         }
 
+       /* Remove qualquer overflow lateral que empurre o layout */
+html, body {
+    overflow-x: hidden !important;
+}
+
+/* Garante que nada ultrapasse a largura da tela */
+* {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+        
+        
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
