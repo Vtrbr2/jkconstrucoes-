@@ -1039,3 +1039,79 @@ body {
   color: inherit;
   display: block;
 }
+.como-funciona {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.como-funciona h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.como-funciona .subtitulo {
+    font-size: 1.1rem;
+    color: #444;
+    margin-bottom: 40px;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* CARD */
+.step h3 {
+    font-size: 1.3rem;
+    margin-top: 18px;
+    font-weight: 700;
+}
+
+.step p {
+    color: #444;
+    font-size: 0.95rem;
+}
+
+/* ÍCONE + CÍRCULO */
+.icone-area {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 3px solid #b45cff; /* ROXO */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ícone */
+.icone-area img {
+    width: 55px;
+
+    /* ROXO (deixa ícone preto virar roxo) */
+    filter: invert(27%) sepia(71%) saturate(5600%) hue-rotate(253deg)
+            brightness(87%) contrast(95%);
+}
+
+/* Número */
+.numero {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
