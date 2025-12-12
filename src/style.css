@@ -202,7 +202,7 @@ body {
     bottom: 0;
     width: 100%;
     height: 45%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0), #000);
+    background: linear-gradient(to bottom, rgba(0,0,0,0), #fff);
     z-index: -1;
 }
 
@@ -238,7 +238,7 @@ body {
 
 /* TÍTULO IGUAL AO MODELO ------------------------------------------------ */
 .title {
-    color: #fff;
+    color: #00f;
     font-size: 38px;
     line-height: 1.3;
     font-weight: 700;
@@ -251,7 +251,7 @@ body {
 
 /* SUBTÍTULO ------------------------------------------------------------- */
 .subtitle {
-    color: #b3b3cc;
+    color: #9370DB;
     font-size: 17px;
     margin-bottom: 40px;
 }
