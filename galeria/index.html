@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Completa - Obras por Cidade</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Filtro de Cidades */
+        .filter-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .filter-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .city-filter {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .city-btn {
+            padding: 12px 24px;
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .city-btn:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        .city-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Grid de Obras */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .work-item {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .work-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .work-item.hidden {
+            display: none;
+        }
+
+        .work-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .work-content {
+            padding: 20px;
+        }
+
+        .work-city {
+            display: inline-block;
+            background-color: #e8f4fc;
+            color: #2980b9;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .work-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .work-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .work-more {
+            color: #3498db;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .work-more:hover {
+            color: #2980b9;
+            gap: 8px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 15px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+            transform: rotate(90deg);
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-content {
+            padding: 30px;
+        }
+
+        .modal-city {
+            display: inline-block;
+            background-color: #e8f4fc;
+            color: #2980b9;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .modal-description {
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .modal-gallery-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-gallery img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .counter {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .modal-gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .modal-image {
+                height: 300px;
+            }
+
+            .city-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-gallery {
+                grid-template-columns: 1fr;
+            }
+
+            .city-filter {
+                gap: 8px;
+            }
+
+            .city-btn {
+                padding: 8px 14px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Galeria Completa de Obras</h1>
+            <p class="subtitle">Explore nossa coleção de obras organizadas por cidade. Cada projeto é uma demonstração de qualidade, criatividade e compromisso com a excelência.</p>
+        </header>
+
+        <section class="filter-section">
+            <h2 class="filter-title">Selecione uma cidade para filtrar as obras</h2>
+            <div class="city-filter">
+                <button class="city-btn active" data-city="todos">Todos</button>
+                <button class="city-btn" data-city="motuca">Motuca</button>
+                <button class="city-btn" data-city="matao">Matão</button>
+                <button class="city-btn" data-city="araraquara">Araraquara</button>
+                <button class="city-btn" data-city="assentamento">Assentamento</button>
+                <button class="city-btn" data-city="outros">Outros</button>
+            </div>
+            <p class="counter">Mostrando <span id="count">50</span> obras</p>
+        </section>
+
+        <section class="gallery-grid" id="gallery">
+            <!-- Obras serão inseridas aqui via JavaScript -->
+        </section>
+
+        <footer>
+            <p>Galeria Completa de Obras &copy; 2023 - Todos os direitos reservados</p>
+            <p>Use os filtros para explorar obras por cidade</p>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <img class="modal-image" id="modalImage" src="" alt="Imagem da obra">
+            <div class="modal-content">
+                <span class="modal-city" id="modalCity">Motuca</span>
+                <h2 class="modal-title" id="modalTitle">Título da Obra</h2>
+                <p class="modal-description" id="modalDescription">Descrição completa da obra vai aparecer aqui.</p>
+                
+                <h3 class="modal-gallery-title">Mais fotos desta obra</h3>
+                <div class="modal-gallery" id="modalGallery">
+                    <!-- Imagens adicionais serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados das obras por cidade
+        const obrasData = {
+            motuca: [
+                {
+                    id: 1,
+                    title: "Praça Central de Motuca",
+                    description: "Reforma completa da praça principal, incluindo nova iluminação, bancos e paisagismo.",
+                    image: "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A revitalização da Praça Central de Motuca trouxe novo ânimo para a comunidade. O projeto incluiu nova pavimentação, sistema de drenagem, iluminação LED de baixo consumo, bancos de concreto com madeira de reflorestamento e um novo paisagismo com espécies nativas da região. A obra foi concluída em 6 meses e se tornou um ponto de encontro para famílias e eventos comunitários.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1540324155971-4b2f8066f8cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Escola Municipal de Motuca",
+                    description: "Ampliação da escola com novas salas de aula, laboratório de informática e quadra coberta.",
+                    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A ampliação da Escola Municipal atendeu a uma demanda antiga da comunidade por mais espaço educacional. Foram construídas 6 novas salas de aula, um laboratório de informática com 25 computadores, uma quadra poliesportiva coberta e uma biblioteca. A obra foi realizada em etapas para não atrapalhar o ano letivo e utilizou materiais sustentáveis como tijolo ecológico e telhas térmicas.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Unidade de Saúde da Família",
+                    description: "Construção de nova unidade de saúde com consultórios, sala de vacinação e farmácia básica.",
+                    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A nova Unidade de Saúde da Família trouxe atendimento médico mais próximo da população. A construção inclui 4 consultórios, sala de procedimentos, sala de vacinação, farmácia básica e área de espera climatizada. A unidade atende mais de 2.000 famílias e conta com equipe multidisciplinar incluindo médico, enfermeiro, técnico de enfermagem e agente comunitário de saúde.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1586773860418-dc22f8b874bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                }
+            ],
+            matao: [
+                {
+                    id: 4,
+                    title: "Pavimentação Avenida Central",
+                    description: "Pavimentação asfáltica com drenagem profunda e sinalização viária completa.",
+                    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A pavimentação da Avenida Central melhorou significativamente o tráfego na região. Foram utilizadas técnicas modernas de pavimentação asfáltica com camada drenante, além de instalação de sarjetas e bocas de lobo para escoamento de águas pluviais. A obra incluiu também nova sinalização horizontal e vertical, faixas de pedestres elevadas e pontos de ônibus acessíveis.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1544636337-92e43c4c91c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "Parque Ecológico de Matão",
+                    description: "Criação de parque ecológico com trilhas, ciclovia e área de preservação permanente.",
+                    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "O Parque Ecológico foi criado em uma área de preservação ambiental de 50.000m². O projeto incluiu trilhas para caminhada, ciclovia de 3km, pontes sobre o córrego local, mirante, área de piquenique e centro de educação ambiental. Foram plantadas mais de 2.000 mudas de espécies nativas, criando um corredor ecológico que já atraiu diversas espécies de aves e pequenos mamíferos.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1516937941344-00b4e0337589?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 6,
+                    title: "Centro Esportivo Municipal",
+                    description: "Complexo esportivo com quadras poliesportivas, pista de atletismo e piscina semiolímpica.",
+                    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "O Centro Esportivo Municipal oferece infraestrutura de alto nível para a prática de diversas modalidades esportivas. O complexo conta com 2 quadras poliesportivas cobertas, pista de atletismo de 400m, piscina semiolímpica aquecida, vestiários, arquibancada para 500 pessoas e espaço para fisioterapia esportiva. O local é utilizado para treinamento de atletas locais e sediou diversos campeonatos regionais.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1526676037774-1917bb1e5e0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                }
+            ],
+            araraquara: [
+                {
+                    id: 7,
+                    title: "Teatro Municipal de Araraquara",
+                    description: "Restauração do teatro histórico com modernização técnica e acessibilidade universal.",
+                    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A restauração do Teatro Municipal preservou a arquitetura histórica do edifício de 1920 enquanto incorporou tecnologia moderna. Foram realizados reforços estruturais, instalação de sistema de climatização, modernização da acústica, nova iluminação cênica e sonorização digital. A obra também garantiu acessibilidade universal com rampas, elevador, assentos reservados e tradução em libras disponível.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1503095396549-807759245b35?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 8,
+                    title: "Biblioteca Central Digital",
+                    description: "Modernização da biblioteca com acervo digital, salas de estudo e espaço maker.",
+                    image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A Biblioteca Central foi transformada em um centro de conhecimento digital. Além da preservação do acervo físico de 50.000 volumes, foi criada uma plataforma digital com mais de 100.000 e-books e artigos científicos. O espaço físico ganhou salas de estudo individuais e em grupo, espaço maker com impressora 3D e corte a laser, auditório para palestras e café literário. A biblioteca atende mais de 1.000 usuários por dia.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1535905557558-afc4877a26fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 9,
+                    title: "Ponte sobre o Rio Jacaré-Guaçu",
+                    description: "Construção de nova ponte com 3 vias em cada sentido e passarela para pedestres.",
+                    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A nova ponte sobre o Rio Jacaré-Guaçu resolveu um gargalo histórico no tráfego da região. Com 250m de extensão e 20m de largura, a ponte conta com 3 vias em cada sentido, ciclovia separada e passarela para pedestres com mirantes. A estrutura utiliza tecnologia de concreto protendido que garante vida útil de mais de 100 anos. A obra incluiu também iluminação ornamental que realça a arquitetura durante a noite.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1528837516151-1c8a0c5b13d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                }
+            ],
+            assentamento: [
+                {
+                    id: 10,
+                    title: "Sistema de Irrigação Comunitário",
+                    description: "Implementação de sistema de irrigação por gotejamento para agricultura familiar.",
+                    image: "https://images.unsplash.com/photo-1592841200221-7ef9c2035f14?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "O sistema de irrigação comunitário transformou a produção agrícola do assentamento. Com captação de água de um reservatório próprio e distribuição por mais de 10km de tubulações, o sistema atende 50 famílias com irrigação por gotejamento que economiza 60% de água em comparação com métodos tradicionais. A obra incluiu também capacitação dos agricultores no manejo do sistema e manutenção preventiva.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1592841200221-7ef9c2035f14?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1560493676-04071c5f467b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 11,
+                    title: "Cooperativa de Produção Rural",
+                    description: "Construção de sede para cooperativa com processamento e embalagem de produtos.",
+                    image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A sede da cooperativa fortaleceu a comercialização dos produtos do assentamento. O espaço conta com área para recepção e seleção de produtos, linha de processamento de polpas de frutas, câmara fria, sala de embalagem e escritórios administrativos. A cooperativa agrega valor aos produtos agrícolas, permitindo que os agricultores familiares tenham melhor remuneração por seu trabalho. A estrutura atende mais de 80 famílias associadas.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 12,
+                    title: "Escola do Campo",
+                    description: "Construção de escola rural com pedagogia adaptada à realidade do campo.",
+                    image: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A Escola do Campo foi projetada especificamente para atender crianças e jovens do assentamento. Com currículo que integra conhecimentos acadêmicos com práticas agrícolas sustentáveis, a escola conta com salas de aula, laboratório de ciências, horta educativa, espaço para criação de pequenos animais e área para processamento de alimentos. A pedagogia valoriza os saberes tradicionais da comunidade enquanto prepara os estudantes para os desafios contemporâneos.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                }
+            ],
+            outros: [
+                {
+                    id: 13,
+                    title: "Usina de Energia Solar",
+                    description: "Instalação de usina solar com capacidade para abastecer 5.000 residências.",
+                    image: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A usina solar representa um marco na transição energética da região. Com mais de 20.000 painéis fotovoltaicos distribuídos em 50 hectares, a usina tem capacidade instalada de 10MW, suficiente para abastecer 5.000 residências. O projeto incluiu subestação de conexão com a rede elétrica, sistema de monitoramento remoto e centro de visitantes para educação ambiental. A usina evita a emissão de 8.000 toneladas de CO2 por ano.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1509391366360-2e959784a276?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 14,
+                    title: "Aeroporto Regional",
+                    description: "Modernização do aeroporto regional com nova pista e terminal de passageiros.",
+                    image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "A modernização do aeroporto regional ampliou a conectividade da região. A pista foi ampliada para 2.000m, permitindo operações de aeronaves de maior porte. O novo terminal de passageiros tem capacidade para 500 pessoas, conta com balcões de check-in, raio-X de bagagem, praça de alimentação e sala VIP. A obra incluiu também sistema de pátio para 8 aeronaves, torre de controle modernizada e estacionamento para 300 veículos.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1534083220759-4c3c75cf5c35?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                },
+                {
+                    id: 15,
+                    title: "Centro de Convenções",
+                    description: "Construção de centro de convenções com capacidade para 3.000 pessoas e auditório principal.",
+                    image: "https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                    fullDescription: "O Centro de Convenções se tornou um polo para eventos regionais e nacionais. Com área total de 15.000m², o complexo conta com auditório principal para 1.200 pessoas, 10 salas menores para até 200 pessoas cada, hall de exposições de 5.000m², cozinha industrial e estacionamento para 800 veículos. A arquitetura moderna incorpora elementos sustentáveis como captação de água da chuva, iluminação natural e telhado verde. O centro já sediou mais de 50 eventos desde sua inauguração.",
+                    additionalImages: [
+                        "https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                    ]
+                }
+            ]
+        };
+
+        // Adicionar mais obras para cada cidade (para totalizar pelo menos 10 por cidade)
+        function gerarObrasAdicionais() {
+            const cidades = ['motuca', 'matao', 'araraquara', 'assentamento', 'outros'];
+            const temas = {
+                motuca: ['Posto de Saúde', 'Creche Municipal', 'Centro de Idosos', 'Mercado Municipal', 'Praça de Esportes', 'Biblioteca Comunitária', 'Delegacia', 'Estação de Tratamento de Água', 'Centro Cultural', 'Terminal Rodoviário'],
+                matao: ['Hospital Regional', 'Faculdade Municipal', 'Shopping Center', 'Parque Aquático', 'Estádio Municipal', 'Museu Histórico', 'Feira Livre Coberta', 'Delegacia da Mulher', 'Centro de Reabilitação', 'Zoológico Municipal'],
+                araraquara: ['Museu de Arte', 'Centro de Inovação', 'Horto Florestal', 'Complexo Penitenciário', 'Universidade Pública', 'Aquário Municipal', 'Planetário', 'Centro de Convenções', 'Hipódromo', 'Estação Ferroviária'],
+                assentamento: ['Casa de Sementes', 'Fábrica de Beneficiamento', 'Escola Técnica Agrícola', 'Centro de Capacitação', 'Restaurante Comunitário', 'Agroindústria Familiar', 'Casa de Farinha', 'Viveiro de Mudas', 'Unidade de Compostagem', 'Sede da Associação'],
+                outros: ['Barragem', 'Ferrovia', 'Porto Seco', 'Incubadora de Empresas', 'Centro de Pesquisa', 'Base Militar', 'Estação de Tratamento de Esgoto', 'Usina de Reciclagem', 'Cemitério Parque', 'Monumento Histórico']
+            };
+
+            cidades.forEach(cidade => {
+                for (let i = obrasData[cidade].length + 1; i <= 10; i++) {
+                    const tema = temas[cidade][i-1] || `Obra ${i} - ${cidade}`;
+                    obrasData[cidade].push({
+                        id: obrasData[cidade].length + 1 + (cidades.indexOf(cidade) * 10),
+                        title: `${tema} - ${cidade.charAt(0).toUpperCase() + cidade.slice(1)}`,
+                        description: `Descrição breve da obra ${i} na cidade de ${cidade}. Esta obra beneficiou milhares de pessoas e melhorou a infraestrutura local.`,
+                        image: `https://images.unsplash.com/photo-${1500000000000 + (i * 1000000) + (cidades.indexOf(cidade) * 100)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+                        fullDescription: `Descrição completa da obra ${tema} em ${cidade}. Esta importante intervenção foi realizada com recursos públicos e contou com ampla participação da comunidade local. Os benefícios incluem melhor qualidade de vida, geração de empregos durante a obra e desenvolvimento econômico para a região. A execução respeitou prazos e orçamento, tornando-se referência em gestão de obras públicas.`,
+                        additionalImages: [
+                            `https://images.unsplash.com/photo-${1500000000001 + (i * 1000000) + (cidades.indexOf(cidade) * 100)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+                            `https://images.unsplash.com/photo-${1500000000002 + (i * 1000000) + (cidades.indexOf(cidade) * 100)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`,
+                            `https://images.unsplash.com/photo-${1500000000003 + (i * 1000000) + (cidades.indexOf(cidade) * 100)}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80`
+                        ]
+                    });
+                }
+            });
+        }
+
+        // Chamar função para gerar obras adicionais
+        gerarObrasAdicionais();
+
+        // Estado da aplicação
+        let cidadeAtual = 'todos';
+        let todasObras = [];
+
+        // Inicializar todas as obras
+        function inicializarObras() {
+            todasObras = [];
+            Object.keys(obrasData).forEach(cidade => {
+                obrasData[cidade].forEach(obra => {
+                    todasObras.push({...obra, cidade});
+                });
+            });
+        }
+
+        // DOM Elements
+        const gallery = document.getElementById('gallery');
+        const cityButtons = document.querySelectorAll('.city-btn');
+        const countElement = document.getElementById('count');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalClose = document.getElementById('modalClose');
+        const modalImage = document.getElementById('modalImage');
+        const modalCity = document.getElementById('modalCity');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalGallery = document.getElementById('modalGallery');
+
+        // Renderizar obras na galeria
+        function renderObras(cidade = 'todos') {
+            gallery.innerHTML = '';
+            let obrasParaMostrar = [];
+            
+            if (cidade === 'todos') {
+                obrasParaMostrar = todasObras;
+            } else {
+                obrasParaMostrar = obrasData[cidade] ? obrasData[cidade].map(obra => ({...obra, cidade})) : [];
+            }
+            
+            countElement.textContent = obrasParaMostrar.length;
+            
+            obrasParaMostrar.forEach(obra => {
+                const workItem = document.createElement('div');
+                workItem.className = 'work-item';
+                workItem.setAttribute('data-city', obra.cidade);
+                
+                workItem.innerHTML = `
+                    <img class="work-image" src="${obra.image}" alt="${obra.title}">
+                    <div class="work-content">
+                        <span class="work-city">${obra.cidade.charAt(0).toUpperCase() + obra.cidade.slice(1)}</span>
+                        <h3 class="work-title">${obra.title}</h3>
+                        <p class="work-description">${obra.description}</p>
+                        <div class="work-more" data-id="${obra.id}">
+                            Ver mais detalhes <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+                
+                gallery.appendChild(workItem);
+            });
+            
+            // Adicionar event listeners para os botões "Ver mais detalhes"
+            document.querySelectorAll('.work-more').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const obraId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    abrirModal(obraId);
+                });
+            });
+        }
+
+        // Abrir modal com os detalhes da obra
+        function abrirModal(obraId) {
+            // Encontrar a obra pelo ID
+            let obraSelecionada = null;
+            let cidadeObra = '';
+            
+            Object.keys(obrasData).forEach(cidade => {
+                const obra = obrasData[cidade].find(o => o.id === obraId);
+                if (obra) {
+                    obraSelecionada = obra;
+                    cidadeObra = cidade;
+                }
+            });
+            
+            if (!obraSelecionada) return;
+            
+            // Preencher modal com os dados da obra
+            modalImage.src = obraSelecionada.image;
+            modalImage.alt = obraSelecionada.title;
+            modalCity.textContent = cidadeObra.charAt(0).toUpperCase() + cidadeObra.slice(1);
+            modalTitle.textContent = obraSelecionada.title;
+            modalDescription.textContent = obraSelecionada.fullDescription;
+            
+            // Preencher galeria de imagens adicionais
+            modalGallery.innerHTML = '';
+            obraSelecionada.additionalImages.forEach(imgSrc => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.alt = `Imagem adicional da obra ${obraSelecionada.title}`;
+                modalGallery.appendChild(img);
+            });
+            
+            // Mostrar modal
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fechar modal
+        function fecharModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event Listeners
+        cityButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remover classe active de todos os botões
+                cityButtons.forEach(btn => btn.classList.remove('active'));
+                // Adicionar classe active ao botão clicado
+                button.classList.add('active');
+                // Atualizar cidade atual
+                cidadeAtual = button.getAttribute('data-city');
+                // Renderizar obras para a cidade selecionada
+                renderObras(cidadeAtual);
+            });
+        });
+
+        modalClose.addEventListener('click', fecharModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                fecharModal();
+            }
+        });
+
+        // Inicializar
+        inicializarObras();
+        renderObras();
+    </script>
+</body>
+              </html>
