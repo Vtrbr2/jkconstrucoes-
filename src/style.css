@@ -1039,9 +1039,12 @@ body {
   color: inherit;
   display: block;
 }
+
+
 .como-funciona {
     text-align: center;
     padding: 50px 20px;
+    background: #fff; 
 }
 
 .como-funciona h2 {
