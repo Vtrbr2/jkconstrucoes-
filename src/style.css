@@ -1119,3 +1119,32 @@ body {
     font-size: 0.9rem;
     font-weight: bold;
 }
+.certificado-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 60px auto;
+  padding: 30px;
+  max-width: 600px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.certificado-img {
+  max-width: 100%;
+  width: 420px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.certificado-img:hover {
+  transform: scale(1.03);
+}
+
+.certificado-legenda {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #444;
+  text-align: center;
+}
