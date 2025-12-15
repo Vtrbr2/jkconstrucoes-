@@ -1119,32 +1119,23 @@ body {
     font-size: 0.9rem;
     font-weight: bold;
 }
-.certificado-container {
+.ssl-only {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  margin: 60px auto;
-  padding: 30px;
-  max-width: 600px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  align-items: center;
+  padding: 50px 20px;
+  background: #fff;
 }
 
-.certificado-img {
-  max-width: 100%;
-  width: 420px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.ssl-image {
+  width: 280px;          /* ajuste se quiser maior/menor */
+  max-width: 90%;
+  opacity: 0.95;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.certificado-img:hover {
-  transform: scale(1.03);
-}
-
-.certificado-legenda {
-  margin-top: 20px;
-  font-size: 0.95rem;
-  color: #444;
-  text-align: center;
+/* efeito sutil profissional */
+.ssl-image:hover {
+  transform: scale(1.02);
+  opacity: 1;
 }
